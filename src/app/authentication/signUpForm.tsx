@@ -51,12 +51,25 @@ const SignUpForm = () => {
   });
 
   async function onSubmit(values: z.infer<typeof registerSchema>) {
-    authClient.signUp.email({
-      email: values.email,
-      password: values.password,
-      name: values.name,
-      callbackURL: "/dashboard",
-    });
+    try {
+      const result = await authClient.signUp.email({
+        email: values.email,
+        password: values.password,
+        name: values.name,
+        callbackURL: "/dashboard",
+      });
+
+      if (result.data) {
+        alert("✅ Cadastro realizado com sucesso!");
+        console.log("Usuário criado:", result.data);
+        form.reset();
+        // Redirecionar para dashboard ou login
+        window.location.href = "/dashboard";
+      }
+    } catch (error) {
+      console.error("Erro no cadastro:", error);
+      alert("❌ Erro ao realizar cadastro. Tente novamente.");
+    }
   }
 
   // Renderização do componente
