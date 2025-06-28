@@ -44,8 +44,30 @@ const Authentication = () => {
     },
   });
 
-  const onLogin = (data: z.infer<typeof loginSchema>) => {
-    console.log("Login:", data);
+  const onLogin = async (data: z.infer<typeof loginSchema>) => {
+    try {
+      const result = await fetch("/api/auth/sign-in/email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
+      });
+
+      if (result.ok) {
+        alert("Login realizado com sucesso!");
+        window.location.href = "/dashboard";
+      } else {
+        const error = await result.text();
+        alert(`Erro no login: ${error}`);
+      }
+    } catch (error) {
+      console.error("Erro:", error);
+      alert("Erro ao realizar login");
+    }
   };
 
   // Renderização do componente
