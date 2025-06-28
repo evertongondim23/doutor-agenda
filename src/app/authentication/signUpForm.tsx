@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -18,7 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/auth-client";
 
 // Schema para cadastro
 const registerSchema = z
@@ -49,9 +50,14 @@ const SignUpForm = () => {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof registerSchema>) => {
-    console.log(data);
-  };
+  async function onSubmit(values: z.infer<typeof registerSchema>) {
+    authClient.signUp.email({
+      email: values.email,
+      password: values.password,
+      name: values.name,
+      callbackURL: "/dashboard",
+    });
+  }
 
   // Renderização do componente
   return (
