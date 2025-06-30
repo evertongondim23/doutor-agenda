@@ -1,5 +1,8 @@
 "use client";
 
+// Force dynamic para evitar problemas de SSG
+export const dynamic = "force-dynamic";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
@@ -150,7 +153,12 @@ export default function AuthPage() {
       console.log("❌ Tipo do erro:", typeof error); // Debug
 
       // Verificar se é erro de email duplicado na exceção
-      const errorMessage = error?.message || error?.toString() || "";
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : typeof error === "string"
+            ? error
+            : String(error);
 
       if (
         errorMessage.toLowerCase().includes("email") &&
