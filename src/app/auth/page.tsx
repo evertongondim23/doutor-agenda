@@ -80,6 +80,26 @@ export default function AuthPage() {
     },
   });
 
+  // Função para verificar clínica e redirecionar
+  const checkUserClinicAndRedirect = async () => {
+    try {
+      const response = await fetch("/api/clinics");
+      const result = await response.json();
+
+      if (response.ok && result.clinics && result.clinics.length > 0) {
+        // Usuário tem clínica cadastrada, vai para dashboard
+        router.push("/dashboard");
+      } else {
+        // Usuário não tem clínica, vai para cadastro de clínica
+        router.push("/clinics-form");
+      }
+    } catch (error) {
+      console.error("Erro ao verificar clínica:", error);
+      // Em caso de erro, vai para dashboard (fallback)
+      router.push("/dashboard");
+    }
+  };
+
   // Função de login
   const onLogin = async (data: z.infer<typeof loginSchema>) => {
     try {
@@ -94,7 +114,9 @@ export default function AuthPage() {
       if (result.data && result.data.user) {
         console.log("✅ Login bem-sucedido"); // Debug
         toast.success("Login feito com sucesso!");
-        router.push("/dashboard");
+
+        // Verificar se o usuário tem clínica cadastrada
+        await checkUserClinicAndRedirect();
       } else {
         console.log("❌ Login falhou - credenciais inválidas"); // Debug
         toast.error("Email ou senha incorreto");
@@ -124,7 +146,9 @@ export default function AuthPage() {
         toast.success("Cadastro realizado com sucesso!");
         console.log("Usuário criado:", result.data);
         registerForm.reset();
-        router.push("/dashboard");
+
+        // Novos usuários sempre vão para cadastro de clínica
+        router.push("/clinics-form");
       } else if (result.error) {
         console.log("❌ Erro no cadastro:", result.error); // Debug
 

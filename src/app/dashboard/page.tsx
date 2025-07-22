@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { authClient } from "@/lib/auth-client";
+import Image from "next/image";
 
 interface User {
   name: string;
@@ -32,8 +33,8 @@ interface Doctor {
   id: string;
   name: string;
   specialty: string;
-  appointments: number;
-  avatar: string;
+  avatarImage?: string;
+  appointmentPrice: number;
 }
 
 interface Appointment {
@@ -56,121 +57,125 @@ export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // Dados de exemplo para demonstração
-  const metrics = {
+  const [metrics, setMetrics] = useState({
     revenue: 31760,
     appointments: 203,
     patients: 45,
-    doctors: 12,
-  };
+    doctors: 0, // Será carregado da API
+  });
 
-  const doctors: Doctor[] = [
+  // Doctors data - será carregado da API
+  const [doctorsData, setDoctorsData] = useState<Doctor[]>([]);
+
+  // Appointments data - permanece estático por enquanto
+  const [appointments] = useState<Appointment[]>([
     {
       id: "1",
-      name: "Dr. Lucas Moreira",
-      specialty: "Cardiologista",
-      appointments: 52,
-      avatar: "👨‍⚕️",
-    },
-    {
-      id: "2",
-      name: "Dr. Camila Ferreira",
-      specialty: "Ginecologista",
-      appointments: 45,
-      avatar: "👩‍⚕️",
-    },
-    {
-      id: "3",
-      name: "Dr. Rafael Santos",
-      specialty: "Pediatra",
-      appointments: 38,
-      avatar: "👨‍⚕️",
-    },
-    {
-      id: "4",
-      name: "Dr. Mariana Almeida",
-      specialty: "Dermatologia",
-      appointments: 35,
-      avatar: "👩‍⚕️",
-    },
-  ];
-
-  const appointments: Appointment[] = [
-    {
-      id: "1",
-      patient: "Ana Souza",
-      date: "02/05/25",
+      patient: "Ana Silva",
+      date: "2024-12-12",
       time: "09:00",
       doctor: "Dr. Lucas Moreira",
       status: "Confirmado",
     },
     {
       id: "2",
-      patient: "João Martins",
-      date: "03/05/25",
-      time: "14:30",
-      doctor: "Dr. Lucas Moreira",
+      patient: "Carlos Santos",
+      date: "2024-12-12",
+      time: "10:30",
+      doctor: "Dr. Camila Ferreira",
       status: "Confirmado",
     },
     {
       id: "3",
-      patient: "Camila Borges",
-      date: "04/05/25",
-      time: "11:15",
+      patient: "Maria Oliveira",
+      date: "2024-12-12",
+      time: "14:00",
       doctor: "Dr. Rafael Santos",
       status: "Confirmado",
     },
     {
       id: "4",
-      patient: "Lucas Fernandes",
-      date: "05/05/25",
-      time: "16:45",
-      doctor: "Dr. Camila Ferreira",
+      patient: "João Costa",
+      date: "2024-12-12",
+      time: "15:30",
+      doctor: "Dr. Mariana Almeida",
       status: "Confirmado",
     },
     {
       id: "5",
-      patient: "Beatriz Costa",
-      date: "06/05/25",
-      time: "08:00",
+      patient: "Lucia Fernandes",
+      date: "2024-12-12",
+      time: "16:00",
       doctor: "Dr. Bruno de Oliveira",
       status: "Confirmado",
     },
+  ]);
+
+  // Weekly data for charts
+  const weeklyData = [
+    { day: "Seg", patients: 12, consultations: 8 },
+    { day: "Ter", patients: 19, consultations: 12 },
+    { day: "Qua", patients: 15, consultations: 10 },
+    { day: "Qui", patients: 22, consultations: 15 },
+    { day: "Sex", patients: 18, consultations: 14 },
+    { day: "Sab", patients: 8, consultations: 6 },
+    { day: "Dom", patients: 5, consultations: 3 },
   ];
 
+  // Specialties data
   const specialties: Specialty[] = [
     {
       name: "Cardiologia",
-      appointments: 52,
-      color: "text-red-500",
+      appointments: 12,
+      color: "bg-red-500",
       icon: Heart,
     },
     {
       name: "Ginecologia",
-      appointments: 45,
-      color: "text-pink-500",
+      appointments: 8,
+      color: "bg-pink-500",
       icon: User,
     },
-    { name: "Pediatria", appointments: 38, color: "text-blue-500", icon: Baby },
+    {
+      name: "Pediatria",
+      appointments: 15,
+      color: "bg-blue-500",
+      icon: Baby,
+    },
     {
       name: "Dermatologia",
-      appointments: 35,
-      color: "text-orange-500",
+      appointments: 6,
+      color: "bg-orange-500",
       icon: Scan,
     },
-    { name: "Ortopedia", appointments: 33, color: "text-gray-500", icon: Bone },
+    {
+      name: "Ortopedia",
+      appointments: 10,
+      color: "bg-gray-500",
+      icon: Bone,
+    },
   ];
 
-  const weeklyData = [
-    { day: "Dom", patients: 12, consultations: 3 },
-    { day: "Seg", patients: 15, consultations: 5 },
-    { day: "Ter", patients: 18, consultations: 7 },
-    { day: "Qua", patients: 15, consultations: 5 },
-    { day: "Qui", patients: 17, consultations: 6 },
-    { day: "Sex", patients: 19, consultations: 8 },
-    { day: "Sáb", patients: 16, consultations: 6 },
-  ];
+  // Função para carregar médicos
+  const loadDoctors = async () => {
+    try {
+      const response = await fetch("/api/doctors");
+      const result = await response.json();
+
+      if (response.ok) {
+        const doctors = result.doctors || [];
+        setDoctorsData(doctors);
+
+        // Atualizar métrica de médicos
+        setMetrics((prev) => ({
+          ...prev,
+          doctors: doctors.length,
+        }));
+      }
+    } catch (error) {
+      console.error("Erro ao carregar médicos:", error);
+    }
+  };
 
   useEffect(() => {
     const getSession = async () => {
@@ -188,6 +193,9 @@ export default function DashboardPage() {
 
           if (response.ok && result.clinics.length === 0) {
             router.push("/clinics-form");
+          } else {
+            // Carregar dados dos médicos
+            await loadDoctors();
           }
         } else {
           router.push("/login");
@@ -247,16 +255,28 @@ export default function DashboardPage() {
                 <Calendar className="mr-3 h-4 w-4" />
                 Dashboard
               </div>
-              <button className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">
+              <button
+                onClick={() => router.push("/agendamentos")}
+                className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+              >
                 <Calendar className="mr-3 h-4 w-4" />
                 Agendamentos
               </button>
-              <button className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">
+              <button
+                onClick={() => router.push("/medicos")}
+                className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+              >
                 <Stethoscope className="mr-3 h-4 w-4" />
                 Médicos
               </button>
-              <button className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">
-                <Users className="mr-3 h-4 w-4" />
+              <button
+                onClick={() => router.push("/pacientes")}
+                className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+              >
+                <Users
+                  className="mr-3 h-4 w-4"
+                  onClick={() => router.push("/pacientes")}
+                />
                 Pacientes
               </button>
             </div>
@@ -519,29 +539,55 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {doctors.map((doctor) => (
-                      <div
-                        key={doctor.id}
-                        className="flex items-center space-x-3"
-                      >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-lg">
-                          {doctor.avatar}
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900">
-                            {doctor.name}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {doctor.specialty}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-xs text-gray-500">
-                            {doctor.appointments} agend.
-                          </p>
-                        </div>
+                    {doctorsData.length === 0 ? (
+                      <div className="py-4 text-center">
+                        <p className="text-sm text-gray-500">
+                          Nenhum médico cadastrado
+                        </p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="mt-2"
+                          onClick={() => router.push("/medicos")}
+                        >
+                          Cadastrar médico
+                        </Button>
                       </div>
-                    ))}
+                    ) : (
+                      doctorsData.map((doctor) => (
+                        <div
+                          key={doctor.id}
+                          className="flex items-center space-x-3"
+                        >
+                          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gray-100">
+                            {doctor.avatarImage ? (
+                              <Image
+                                src={doctor.avatarImage}
+                                alt={doctor.name}
+                                width={40}
+                                height={40}
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <Stethoscope className="h-5 w-5 text-gray-400" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-900">
+                              {doctor.name}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {doctor.specialty}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xs text-gray-500">
+                              R$ {doctor.appointmentPrice?.toFixed(2) || "0.00"}
+                            </p>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -566,9 +612,9 @@ export default function DashboardPage() {
                           className="flex items-center space-x-3"
                         >
                           <div className="flex flex-1 items-center space-x-2">
-                            <IconComponent
-                              className={`h-4 w-4 ${specialty.color}`}
-                            />
+                            <div className={`rounded p-1 ${specialty.color}`}>
+                              <IconComponent className="h-3 w-3 text-white" />
+                            </div>
                             <span className="text-sm text-gray-900">
                               {specialty.name}
                             </span>
