@@ -48,6 +48,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { authClient } from "@/lib/auth-client";
+import PageLayout from "@/components/layout/PageLayout";
 
 interface User {
   name: string;
@@ -353,100 +354,13 @@ export default function MedicosPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <div className="flex w-64 flex-col border-r border-gray-200 bg-white">
-        {/* Logo */}
-        <div className="border-b border-gray-200 p-6">
-          <div className="flex items-center space-x-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
-              <span className="text-sm font-bold text-white">dr</span>
-            </div>
-            <span className="font-semibold text-gray-900">agenda</span>
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-4">
-          <div className="mb-6">
-            <h3 className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
-              Menu Principal
-            </h3>
-            <div className="space-y-1">
-              <button
-                onClick={() => router.push("/dashboard")}
-                className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
-              >
-                <Calendar
-                  className="mr-3 h-4 w-4"
-                  onClick={() => router.push("/dashboard")}
-                />
-                Dashboard
-              </button>
-              <button className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">
-                <Calendar
-                  className="mr-3 h-4 w-4"
-                  onClick={() => router.push("/agendamentos")}
-                />
-                Agendamentos
-              </button>
-              <button
-                onClick={() => router.push("/medicos")}
-                className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
-              >
-                <Stethoscope className="mr-3 h-4 w-4" />
-                Médicos
-              </button>
-              <button className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">
-                <Users
-                  className="mr-3 h-4 w-4"
-                  onClick={() => router.push("/pacientes")}
-                />
-                Pacientes
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
-              Outros
-            </h3>
-            <button className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">
-              <DollarSign className="mr-3 h-4 w-4" />
-              Planos
-            </button>
-          </div>
-        </nav>
-
-        {/* Footer */}
-        <div className="border-t border-gray-200 p-4">
-          <div className="flex items-center space-x-2 text-sm text-gray-500">
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-200">
-              <span className="text-xs font-medium">CC</span>
-            </div>
-            <div>
-              <p className="font-medium">Clínica Care</p>
-              <p className="text-xs">clinica@example.com</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex flex-1 flex-col">
-        {/* Header */}
-        <header className="border-b border-gray-200 bg-white px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="mb-1 text-sm text-gray-500">
-                Menu Principal &gt; Médicos
-              </div>
-              <h1 className="text-2xl font-semibold text-gray-900">Médicos</h1>
-              <p className="text-sm text-gray-600">
-                Access a detailed overview of key metrics and patient outcomes
-              </p>
-            </div>
-            <div className="flex items-center space-x-4">
+    <PageLayout
+      title="Médicos"
+      description="Access a detailed overview of key metrics and patient outcomes"
+      user={user || undefined}
+      onLogout={handleLogout}
+      headerAction={
+        <div className="flex items-center space-x-4">
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="flex items-center space-x-2">
@@ -841,8 +755,6 @@ export default function MedicosPage() {
               ))}
             </div>
           )}
-        </main>
-      </div>
       <Dialog
         open={!!selectedDoctor}
         onOpenChange={(open) => !open && setSelectedDoctor(null)}
@@ -892,6 +804,6 @@ export default function MedicosPage() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </PageLayout>
   );
 }

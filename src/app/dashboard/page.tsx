@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { authClient } from "@/lib/auth-client";
+import PageLayout from "@/components/layout/PageLayout";
 import Image from "next/image";
 
 interface User {
@@ -231,407 +232,299 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <div className="flex w-64 flex-col border-r border-gray-200 bg-white">
-        {/* Logo */}
-        <div className="border-b border-gray-200 p-6">
-          <div className="flex items-center space-x-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
-              <span className="text-sm font-bold text-white">dr</span>
-            </div>
-            <span className="font-semibold text-gray-900">agenda</span>
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-4">
-          <div className="mb-6">
-            <h3 className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
-              Menu Principal
-            </h3>
-            <div className="space-y-1">
-              <div className="flex items-center rounded-lg bg-blue-50 px-3 py-2 text-sm font-medium text-blue-600">
-                <Calendar className="mr-3 h-4 w-4" />
-                Dashboard
+    <PageLayout
+      title="Dashboard"
+      description="Access a detailed overview of key metrics and patient outcomes"
+      user={user || undefined}
+      onLogout={handleLogout}
+      headerAction={
+        <Button variant="outline" className="flex items-center space-x-2">
+          <span>Maio</span>
+          <ChevronDown className="h-4 w-4" />
+        </Button>
+      }
+    >
+      {/* Metrics Cards */}
+      <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <div className="rounded-lg bg-green-100 p-2">
+                <DollarSign className="h-6 w-6 text-green-600" />
               </div>
-              <button
-                onClick={() => router.push("/agendamentos")}
-                className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
-              >
-                <Calendar className="mr-3 h-4 w-4" />
-                Agendamentos
-              </button>
-              <button
-                onClick={() => router.push("/medicos")}
-                className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
-              >
-                <Stethoscope className="mr-3 h-4 w-4" />
-                Médicos
-              </button>
-              <button
-                onClick={() => router.push("/pacientes")}
-                className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
-              >
-                <Users
-                  className="mr-3 h-4 w-4"
-                  onClick={() => router.push("/pacientes")}
-                />
-                Pacientes
-              </button>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Faturamento</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  R$ {metrics.revenue.toLocaleString("pt-BR")}
+                </p>
+              </div>
             </div>
-          </div>
+          </CardContent>
+        </Card>
 
-          <div>
-            <h3 className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
-              Outros
-            </h3>
-            <button className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">
-              <DollarSign className="mr-3 h-4 w-4" />
-              Planos
-            </button>
-          </div>
-        </nav>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <div className="rounded-lg bg-blue-100 p-2">
+                <Calendar className="h-6 w-6 text-blue-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">
+                  Agendamentos
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {metrics.appointments}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* Footer */}
-        <div className="border-t border-gray-200 p-4">
-          <div className="flex items-center space-x-2 text-sm text-gray-500">
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-200">
-              <span className="text-xs font-medium">CC</span>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <div className="rounded-lg bg-purple-100 p-2">
+                <Users className="h-6 w-6 text-purple-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Pacientes</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {metrics.patients}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="font-medium">Clínica Care</p>
-              <p className="text-xs">clinica@example.com</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <div className="rounded-lg bg-orange-100 p-2">
+                <Stethoscope className="h-6 w-6 text-orange-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Médicos</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {metrics.doctors}
+                </p>
+              </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Main Content */}
-      <div className="flex flex-1 flex-col">
-        {/* Header */}
-        <header className="border-b border-gray-200 bg-white px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="mb-1 text-sm text-gray-500">
-                Menu Principal &gt; Dashboard
-              </div>
-              <h1 className="text-2xl font-semibold text-gray-900">
-                Dashboard
-              </h1>
-              <p className="text-sm text-gray-600">
-                Access a detailed overview of key metrics and patient outcomes
-              </p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="outline" className="flex items-center space-x-2">
-                <span>Maio</span>
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-              <div className="text-right">
-                <p className="text-sm font-medium text-gray-900">
-                  {user?.name}
-                </p>
-                <p className="text-xs text-gray-500">{user?.email}</p>
-              </div>
-              <Button onClick={handleLogout} variant="outline" size="sm">
-                Sair
-              </Button>
-            </div>
-          </div>
-        </header>
-
-        {/* Dashboard Content */}
-        <main className="flex-1 p-6">
-          {/* Metrics Cards */}
-          <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="rounded-lg bg-green-100 p-2">
-                    <DollarSign className="h-6 w-6 text-green-600" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">
-                      Faturamento
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      R$ {metrics.revenue.toLocaleString("pt-BR")}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="rounded-lg bg-blue-100 p-2">
-                    <Calendar className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">
-                      Agendamentos
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {metrics.appointments}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="rounded-lg bg-purple-100 p-2">
-                    <Users className="h-6 w-6 text-purple-600" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">
-                      Pacientes
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {metrics.patients}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="rounded-lg bg-orange-100 p-2">
-                    <Stethoscope className="h-6 w-6 text-orange-600" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Médicos</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {metrics.doctors}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            {/* Charts and Tables Section */}
-            <div className="space-y-6 lg:col-span-2">
-              {/* Patients Chart */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Users className="mr-2 h-5 w-5" />
-                    Pacientes
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex h-64 items-end justify-between space-x-2">
-                    {weeklyData.map((data) => (
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Charts and Tables Section */}
+        <div className="space-y-6 lg:col-span-2">
+          {/* Patients Chart */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Users className="mr-2 h-5 w-5" />
+                Pacientes
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex h-64 items-end justify-between space-x-2">
+                {weeklyData.map((data) => (
+                  <div
+                    key={data.day}
+                    className="flex flex-1 flex-col items-center"
+                  >
+                    <div className="mb-2 flex w-full flex-col space-y-1">
                       <div
-                        key={data.day}
-                        className="flex flex-1 flex-col items-center"
-                      >
-                        <div className="mb-2 flex w-full flex-col space-y-1">
-                          <div
-                            className="w-full rounded-sm bg-blue-500"
-                            style={{
-                              height: `${(data.patients / 20) * 100}%`,
-                              minHeight: "8px",
-                            }}
+                        className="w-full rounded-sm bg-blue-500"
+                        style={{
+                          height: `${(data.patients / 20) * 100}%`,
+                          minHeight: "8px",
+                        }}
+                      />
+                      <div
+                        className="w-full rounded-sm bg-green-500"
+                        style={{
+                          height: `${(data.consultations / 10) * 100}%`,
+                          minHeight: "4px",
+                        }}
+                      />
+                    </div>
+                    <span className="text-xs text-gray-600">{data.day}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 flex justify-center space-x-4 text-xs">
+                <div className="flex items-center">
+                  <div className="mr-1 h-3 w-3 rounded-sm bg-blue-500" />
+                  <span>Pacientes</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="mr-1 h-3 w-3 rounded-sm bg-green-500" />
+                  <span>Consultas</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Appointments Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Calendar className="mr-2 h-5 w-5" />
+                Agendamentos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+                        Paciente
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+                        Data
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+                        Doutor
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {appointments.map((appointment) => (
+                      <tr key={appointment.id} className="border-b">
+                        <td className="px-4 py-3 text-sm text-gray-900">
+                          {appointment.patient}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">
+                          {appointment.date}, {appointment.time}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">
+                          {appointment.doctor}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
+                            • {appointment.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right Sidebar */}
+        <div className="space-y-6">
+          {/* Doctors */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center">
+                  <Stethoscope className="mr-2 h-5 w-5" />
+                  Médicos
+                </CardTitle>
+                <Button variant="ghost" size="sm" className="text-blue-600">
+                  Ver todos
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {doctorsData.length === 0 ? (
+                  <div className="py-4 text-center">
+                    <p className="text-sm text-gray-500">
+                      Nenhum médico cadastrado
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-2"
+                      onClick={() => router.push("/medicos")}
+                    >
+                      Cadastrar médico
+                    </Button>
+                  </div>
+                ) : (
+                  doctorsData.map((doctor) => (
+                    <div
+                      key={doctor.id}
+                      className="flex items-center space-x-3"
+                    >
+                      <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gray-100">
+                        {doctor.avatarImage ? (
+                          <Image
+                            src={doctor.avatarImage}
+                            alt={doctor.name}
+                            width={40}
+                            height={40}
+                            className="h-full w-full object-cover"
                           />
-                          <div
-                            className="w-full rounded-sm bg-green-500"
-                            style={{
-                              height: `${(data.consultations / 10) * 100}%`,
-                              minHeight: "4px",
-                            }}
-                          />
+                        ) : (
+                          <Stethoscope className="h-5 w-5 text-gray-400" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900">
+                          {doctor.name}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {doctor.specialty}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-gray-500">
+                          R$ {doctor.appointmentPrice?.toFixed(2) || "0.00"}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Specialties */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Especialidades</CardTitle>
+                <Button variant="ghost" size="sm" className="text-blue-600">
+                  Ver todos
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {specialties.map((specialty) => {
+                  const IconComponent = specialty.icon;
+                  return (
+                    <div
+                      key={specialty.name}
+                      className="flex items-center space-x-3"
+                    >
+                      <div className="flex flex-1 items-center space-x-2">
+                        <div className={`rounded p-1 ${specialty.color}`}>
+                          <IconComponent className="h-3 w-3 text-white" />
                         </div>
-                        <span className="text-xs text-gray-600">
-                          {data.day}
+                        <span className="text-sm text-gray-900">
+                          {specialty.name}
                         </span>
                       </div>
-                    ))}
-                  </div>
-                  <div className="mt-4 flex justify-center space-x-4 text-xs">
-                    <div className="flex items-center">
-                      <div className="mr-1 h-3 w-3 rounded-sm bg-blue-500" />
-                      <span>Pacientes</span>
+                      <span className="text-xs text-gray-500">
+                        {specialty.appointments} agend.
+                      </span>
                     </div>
-                    <div className="flex items-center">
-                      <div className="mr-1 h-3 w-3 rounded-sm bg-green-500" />
-                      <span>Consultas</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Appointments Table */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Calendar className="mr-2 h-5 w-5" />
-                    Agendamentos
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">
-                            Paciente
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">
-                            Data
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">
-                            Doutor
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">
-                            Status
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {appointments.map((appointment) => (
-                          <tr key={appointment.id} className="border-b">
-                            <td className="px-4 py-3 text-sm text-gray-900">
-                              {appointment.patient}
-                            </td>
-                            <td className="px-4 py-3 text-sm text-gray-600">
-                              {appointment.date}, {appointment.time}
-                            </td>
-                            <td className="px-4 py-3 text-sm text-gray-600">
-                              {appointment.doctor}
-                            </td>
-                            <td className="px-4 py-3">
-                              <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
-                                • {appointment.status}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Right Sidebar */}
-            <div className="space-y-6">
-              {/* Doctors */}
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center">
-                      <Stethoscope className="mr-2 h-5 w-5" />
-                      Médicos
-                    </CardTitle>
-                    <Button variant="ghost" size="sm" className="text-blue-600">
-                      Ver todos
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {doctorsData.length === 0 ? (
-                      <div className="py-4 text-center">
-                        <p className="text-sm text-gray-500">
-                          Nenhum médico cadastrado
-                        </p>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="mt-2"
-                          onClick={() => router.push("/medicos")}
-                        >
-                          Cadastrar médico
-                        </Button>
-                      </div>
-                    ) : (
-                      doctorsData.map((doctor) => (
-                        <div
-                          key={doctor.id}
-                          className="flex items-center space-x-3"
-                        >
-                          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gray-100">
-                            {doctor.avatarImage ? (
-                              <Image
-                                src={doctor.avatarImage}
-                                alt={doctor.name}
-                                width={40}
-                                height={40}
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              <Stethoscope className="h-5 w-5 text-gray-400" />
-                            )}
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm font-medium text-gray-900">
-                              {doctor.name}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {doctor.specialty}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-xs text-gray-500">
-                              R$ {doctor.appointmentPrice?.toFixed(2) || "0.00"}
-                            </p>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Specialties */}
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle>Especialidades</CardTitle>
-                    <Button variant="ghost" size="sm" className="text-blue-600">
-                      Ver todos
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {specialties.map((specialty) => {
-                      const IconComponent = specialty.icon;
-                      return (
-                        <div
-                          key={specialty.name}
-                          className="flex items-center space-x-3"
-                        >
-                          <div className="flex flex-1 items-center space-x-2">
-                            <div className={`rounded p-1 ${specialty.color}`}>
-                              <IconComponent className="h-3 w-3 text-white" />
-                            </div>
-                            <span className="text-sm text-gray-900">
-                              {specialty.name}
-                            </span>
-                          </div>
-                          <span className="text-xs text-gray-500">
-                            {specialty.appointments} agend.
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </main>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }

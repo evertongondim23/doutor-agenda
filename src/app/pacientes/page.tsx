@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import PageLayout from "@/components/layout/PageLayout";
 
 interface Patient {
   id?: string;
@@ -16,6 +17,7 @@ interface Patient {
   birthDate: string;
   rg: string;
   address: string;
+  city?: string;
 }
 
 // Defina emptyPatient fora do componente para garantir referência estável
@@ -78,105 +80,23 @@ export default function PacientesPage() {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <div className="flex w-64 flex-col border-r border-gray-200 bg-white">
-        {/* Logo */}
-        <div className="border-b border-gray-200 p-6">
-          <div className="flex items-center space-x-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
-              <span className="text-sm font-bold text-white">dr</span>
-            </div>
-            <span className="font-semibold text-gray-900">agenda</span>
-          </div>
-        </div>
-        {/* Navigation */}
-        <nav className="flex-1 p-4">
-          <div className="mb-6">
-            <h3 className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
-              Menu Principal
-            </h3>
-            <div className="space-y-1">
-              <button
-                onClick={() => router.push("/dashboard")}
-                className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
-              >
-                Dashboard
-              </button>
-              <button
-                onClick={() => router.push("/agendamentos")}
-                className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
-              >
-                Agendamentos
-              </button>
-              <button
-                onClick={() => router.push("/medicos")}
-                className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
-              >
-                Médicos
-              </button>
-              <div
-                onClick={() => router.push("/pacientes")}
-                className="flex items-center rounded-lg bg-blue-50 px-3 py-2 text-sm font-medium text-blue-600"
-              >
-                Pacientes
-              </div>
-            </div>
-          </div>
-          <div>
-            <h3 className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
-              Outros
-            </h3>
-            <button className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">
-              Planos
-            </button>
-          </div>
-        </nav>
-        {/* Footer */}
-        <div className="border-t border-gray-200 p-4">
-          <div className="flex items-center space-x-2 text-sm text-gray-500">
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-200">
-              <span className="text-xs font-medium">CC</span>
-            </div>
-            <div>
-              <p className="font-medium">Clínica Care</p>
-              <p className="text-xs">mail@example.com</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* Main Content */}
-      <div className="flex flex-1 flex-col">
-        {/* Header */}
-        <header className="border-b border-gray-200 bg-white px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="mb-1 text-sm text-gray-500">
-                Menu Principal &gt;{" "}
-                <span className="text-blue-600">Pacientes</span>
-              </div>
-              <h1 className="text-2xl font-semibold text-gray-900">
-                Pacientes
-              </h1>
-              <p className="text-sm text-gray-600">
-                Access a detailed overview of key metrics and patient outcomes
-              </p>
-            </div>
-            <Button
-              className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700"
-              onClick={() => {
-                setIsDialogOpen(true);
-                setEditMode(false);
-                setForm(emptyPatient);
-              }}
-            >
-              <Plus className="h-4 w-4" />
-              <span>Adicionar paciente</span>
-            </Button>
-          </div>
-        </header>
-        {/* Table */}
-        <main className="flex-1 p-6">
+    <PageLayout
+      title="Pacientes"
+      description="Access a detailed overview of key metrics and patient outcomes"
+      headerAction={
+        <Button
+          className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700"
+          onClick={() => {
+            setIsDialogOpen(true);
+            setEditMode(false);
+            setForm(emptyPatient);
+          }}
+        >
+          <Plus className="h-4 w-4" />
+          <span>Adicionar paciente</span>
+        </Button>
+      }
+    >
           <div className="overflow-x-auto rounded-lg bg-white p-6 shadow-sm">
             {loading ? (
               <div className="py-8 text-center">Carregando...</div>
@@ -578,7 +498,6 @@ export default function PacientesPage() {
             </div>
           </div>
         )}
-      </div>
-    </div>
+    </PageLayout>
   );
 }
